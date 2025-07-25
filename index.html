@@ -47,7 +47,33 @@
       height: 100%;
       display: block; 
       /* block으로 안 하면 아래쪽에 여백 생김 */
+
     }
+    @media (max-width: 768px) {
+    body {
+      flex-direction: column;
+    }
+
+    #blocklyArea {
+      width: 100vw;
+      height: 50vh;
+      border-right: none;
+      border-bottom: 1px solid #ccc;
+    }
+
+    #unityArea {
+      width: 100vw;
+      height: 50vh;
+    }
+
+    iframe,
+    canvas#unityCanvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    }
+
   </style>
 </head>
 <body>
