@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unity WebGL + Blockly 통합 테스트</title>
+
+  <style>
+    /* 전체 화면을 좌우로 나누기 위해 flex 사용 */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* 왼쪽이랑 오른쪽 영역 높이 똑같이 맞춤 */
+    #blocklyArea, #unityArea {
+      height: 100vh;
+    }
+
+    /* 왼쪽은 Blockly 들어갈 자리 (40%) */
+    #blocklyArea {
+      width: 40vw;
+      border-right: 1px solid #ccc; /* 구분선 */
+    }
+
+    /* 오른쪽은 Unity 캔버스 들어갈 자리 (60%) */
+    #unityArea {
+      width: 60vw;
+      background: #000; /* 검정 배경 */
+      display: flex;
+      align-items: center;  /* 위아래 가운데 정렬 */
+      justify-content: center; /* 좌우 가운데 정렬 */
+    }
+
+    /* Blockly를 iframe으로 띄울 때 스타일 */
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none; /* 테두리 없앰 */
+    }
+
+    /* Unity 캔버스 크기 꽉 채우고 여백 없게 설정 */
+    canvas#unityCanvas {
+      width: 100%;
+      height: 100%;
+      display: block; 
+      /* block으로 안 하면 아래쪽에 여백 생김 */
+    }
+  </style>
+</head>
+<body>
+  <!-- 왼쪽에 Blockly iframe 들어감 -->
+  <div id="blocklyArea">
+    <iframe id="blocklyIframe" src="blockly.html"></iframe>
+  </div>
+
+  <!-- 오른쪽에 Unity WebGL 캔버스 들어감 -->
+  <div id="unityArea">
+    <canvas id="unityCanvas"></canvas>
+  </div>
+
+  <script>
+    // Unity 빌드 폴더 경로
+    const unityFolderPath = "Build";
+    const unityLoaderScript = unityFolderPath + "/webgl.loader.js";
+
+    // Unity 실행할 때 필요한 설정들
+    const unitySetting = {
+      dataUrl: unityFolderPath + "/webgl.data",
+      frameworkUrl: unityFolderPath + "/webgl.framework.js",
+      codeUrl: unityFolderPath + "/webgl.wasm",
+      streamingAssetsUrl: "StreamingAssets", // 리소스 파일들 들어있는 폴더
+      companyName: "YourCompany",
+      productName: "JSBridge",
+      productVersion: "1.0"
+    };
+
+    let unityApp = null; // Unity 인스턴스 저장용
+
+    // Unity 로더 스크립트를 만들어서 붙임
+    const loaderScriptTag = document.createElement("script");
+    loaderScriptTag.src = unityLoaderScript;
+
+    // 로더 스크립트 다 불러오면 실행
+    loaderScriptTag.onload = () => {
+      // Unity 인스턴스 실행
+      createUnityInstance(document.querySelector("#unityCanvas"), unitySetting, () => {
+        // 에러 처리용 콜백 (일단 비워놓음)
+      }).then((instance) => {
+        unityApp = instance;
+        console.log("Unity 실행 완료");
+      });
+    };
+
+    // 만든 script 태그를 body에 붙임
+    document.body.appendChild(loaderScriptTag);
+
+    // Blockly 쪽에서 코드 받아오는 이벤트 리스너
+    window.addEventListener("message", (event) => {
+      if (event.data?.type === "blockly-code") {
+        const blocklyCode = event.data.payload;
+        console.log("Blockly에서 받은 코드:\n", blocklyCode);
+
+        // Unity 로딩 끝났으면 코드 보냄(블라키에서 생성한 코드)
+        if (unityApp) {
+          unityApp.SendMessage("JSBridge", "SetTextFromJS", blocklyCode);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
