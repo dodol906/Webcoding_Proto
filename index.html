@@ -12,8 +12,6 @@
       margin: 0;
       padding: 0;
       display: flex;
-      overflow-x:auto;
-      overflow-y:auto;
     }
 
     /* 왼쪽이랑 오른쪽 영역 높이 똑같이 맞춤 */
@@ -21,15 +19,15 @@
       height: 100vh;
     }
 
-    /* 왼쪽은 Blockly 들어갈 자리 (40%) */
+    /* 왼쪽은 Blockly 들어갈 자리 (50%) */
     #blocklyArea {
-      width: 40vw;
+      width: 50vw;
       border-right: 1px solid #ccc; /* 구분선 */
     }
 
-    /* 오른쪽은 Unity 캔버스 들어갈 자리 (60%) */
+    /* 오른쪽은 Unity 캔버스 들어갈 자리 (50%) */
     #unityArea {
-      width: 60vw;
+      width: 50vw;
       background: #000; /* 검정 배경 */
       display: flex;
       align-items: center;  /* 위아래 가운데 정렬 */
